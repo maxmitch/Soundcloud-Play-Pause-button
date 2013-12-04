@@ -1,10 +1,77 @@
-Soundcloud-Play-Pause-button
+<!--Soundcloud-Play-Pause-button
 ============================
 
-This is a little bit of code that I created to make a little "Pause/Play" player out of sound cloud.
+This is a little bit of code that I created to make a little "Pause/Play" player out of the my most recent like soundcloud.
 
 See example: http://tragicclothing.co.uk/soundcloud-player.php
 
-So first off put inside your <head>:
+-->
+<head>
 
-<script type="text/javascript" src="jquery.js"></script> //
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<!--this connects you to soundcloud-->
+<script src="//connect.soundcloud.com/sdk.js"></script>
+<script>
+  SC.initialize({
+    client_id: 'f3494069745efb71431153ddc8912985' //You can use your own client ID 
+});
+$(document).ready(function () {
+    SC.get("/users/your_username/favorites", function (track) {
+        $('#soundcloudimage').css('background-image', 'url(' + track[song].artwork_url.replace('large', 't500x500') + ')'); //I have replaced 'large' with 't500x500' inside the URL because it gives you a larger image file of up to 500x500px
+    });
+});
+</script>
+
+<!--This is which track you want it to play out of the list of tracks in your "like" section of your soundcloud page. So var song = 0 is track 1 and  var song = 1 is track 2-->
+<script> var song = 0 </script>
+
+<!--This is optional css. I just found it looks better that when you hover over the play and pause button (you are going to make), the opacity changes. And also to add a curve to the corners artwork-->
+<style>
+#swap{
+	opacity:0.5;
+}
+
+#swap:hover{
+	opacity:0.8;
+}
+/* I am setting the W x H to 300x300 for the whole thing you can change it as long as it is smaller than 500x500 */
+#soundcloudimage{
+	width:300;
+	height:300;
+	position:relative;
+	background-size:300px 300px; 
+	background-repeat:no-repeat;
+	border-radius: 20px;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+}
+</style>
+</head>
+<body>
+
+<div style="width:300px" id="soundcloudimage">
+<img id="swap" src="Play.png" width="300" height="300" /><!--You need to create 2 files Play.png and Pause.png--> 
+</div>
+<script>
+$(document).ready(function() {
+window.sound = null;
+$('#swap').on('click', function(e){
+  if ($(this).attr('src') == 'Play.png') {
+    if (!sound) {
+      SC.get("/users/your_username/favorites", function (tracks) {
+        SC.stream("/tracks/" + tracks[song].id, function (sound) {
+          window.sound = sound;
+          sound.play();
+        });
+      });
+    } else { sound.play() }
+    $(this).attr('src', "Pause.png");
+  } else {
+    sound.pause();
+    $(this).attr('src', "Play.png");
+  }
+});
+});
+</script>
+</body>
